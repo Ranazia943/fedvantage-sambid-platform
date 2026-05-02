@@ -7,13 +7,18 @@ export default function PayPalPayment({ amount, planName, billingCycle, onSucces
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const handleSimulatedPayment = async () => {
+  console.log('PayPalPayment received:', { amount, planName, billingCycle });
+
+  const handlePayment = async () => {
+    if (!planName) {
+      setError('Invalid plan selection. Please try again.');
+      return;
+    }
+    
     setLoading(true);
     setError(null);
     
     try {
-      console.log('PayPal payment with:', { planName, billingCycle });
-      
       const orderResponse = await paymentAPI.createPayPalOrder({
         planName: planName,
         billingCycle: billingCycle
@@ -70,7 +75,7 @@ export default function PayPalPayment({ amount, planName, billingCycle, onSucces
       </div>
       
       <button
-        onClick={handleSimulatedPayment}
+        onClick={handlePayment}
         disabled={loading}
         className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 disabled:opacity-50 flex items-center justify-center gap-2"
       >
@@ -82,13 +87,13 @@ export default function PayPalPayment({ amount, planName, billingCycle, onSucces
         ) : (
           <>
             <CreditCard className="w-4 h-4" />
-            Simulate PayPal Payment (${amount})
+            Pay ${amount}
           </>
         )}
       </button>
       
       <p className="text-xs text-gray-500 text-center mt-4">
-        Demo mode - No actual payment will be processed. After clicking, your plan will be upgraded.
+        Demo mode - No actual payment will be processed. Your plan will be upgraded immediately.
       </p>
     </div>
   );
