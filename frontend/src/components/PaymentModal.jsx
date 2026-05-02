@@ -11,6 +11,13 @@ export default function PaymentModal({ isOpen, onClose, plan, billingCycle }) {
   if (!isOpen || !plan) return null;
 
   const amount = billingCycle === 'monthly' ? plan.priceMonthly : plan.priceYearly;
+  
+  // FIX: Get the correct plan name
+  // plan.id might be 'pro', 'starter', or 'enterprise' from the Pricing page
+  const planName = plan.id || plan.name;  // Use plan.id first, fallback to plan.name
+  const planDisplayName = plan.displayName || plan.name;
+  
+  console.log('PaymentModal - plan:', { id: plan.id, name: plan.name, amount, planName });
 
   const handleSuccess = () => {
     setSuccess(true);
@@ -27,7 +34,7 @@ export default function PaymentModal({ isOpen, onClose, plan, billingCycle }) {
         <div className="flex justify-between items-center p-6 border-b border-gray-100 sticky top-0 bg-white">
           <div>
             <h2 className="text-xl font-bold text-gray-900">Complete Your Upgrade</h2>
-            <p className="text-sm text-gray-500 mt-1">{plan.name} Plan - {billingCycle === 'monthly' ? 'Monthly' : 'Yearly'} Billing</p>
+            <p className="text-sm text-gray-500 mt-1">{planDisplayName} Plan - {billingCycle === 'monthly' ? 'Monthly' : 'Yearly'} Billing</p>
           </div>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
             <X className="w-5 h-5" />
@@ -40,7 +47,7 @@ export default function PaymentModal({ isOpen, onClose, plan, billingCycle }) {
             <div className="p-6">
               <div className="bg-gray-50 rounded-lg p-4 mb-6">
                 <div className="flex justify-between items-center mb-2">
-                  <span className="text-gray-600">{plan.name} Plan</span>
+                  <span className="text-gray-600">{planDisplayName} Plan</span>
                   <span className="font-semibold">${amount}</span>
                 </div>
                 <div className="flex justify-between items-center text-sm text-gray-500">
@@ -107,7 +114,7 @@ export default function PaymentModal({ isOpen, onClose, plan, billingCycle }) {
               {paymentMethod === 'stripe' ? (
                 <StripePayment
                   amount={amount}
-                  planName={plan.id}
+                  planName={planName}
                   billingCycle={billingCycle}
                   onSuccess={handleSuccess}
                   onClose={onClose}
@@ -115,7 +122,7 @@ export default function PaymentModal({ isOpen, onClose, plan, billingCycle }) {
               ) : (
                 <PayPalPayment
                   amount={amount}
-                  planName={plan.id}
+                  planName={planName}
                   billingCycle={billingCycle}
                   onSuccess={handleSuccess}
                   onClose={onClose}
@@ -134,7 +141,7 @@ export default function PaymentModal({ isOpen, onClose, plan, billingCycle }) {
             </div>
             <h3 className="text-lg font-semibold text-gray-900 mb-2">Payment Successful!</h3>
             <p className="text-gray-600">
-              Your plan has been upgraded to {plan.name}. Redirecting...
+              Your plan has been upgraded to {planDisplayName}. Redirecting...
             </p>
           </div>
         )}
